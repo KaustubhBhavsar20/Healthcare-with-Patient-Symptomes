@@ -101,7 +101,42 @@
                 
             </div>
             <pre id="records" style="padding: 40px; width: 60%; margin: auto; font-family: poppins; border: 2px solid #1977cc; border-radius: 10px; background-color: #1977cc10; color:#2c4964;">
-
+                <div id="notinclude">
+                <div class="row">
+                    <div class="form-group col-sm-10">
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <label class="control-label" for="symptomes">Symptoms:</label>
+                            </div>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" rows="5" id="symptomes" placeholder="Enter your current symptomes" name = "Details" style="width: inherit" required autofocus></textarea>
+                                <!-- <input type="text" class="form-control" id="details" placeholder="Enter details to be added" name = "Details" style="width: inherit" required autofocus> -->
+                            </div>
+                        </div>    
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="form-group col-sm-10">
+                        <div class="row">
+                            <div class="col-sm-2"><label for="intensity" class="control-label">Intensity:</label></div>
+                            <div class="col-sm-10">
+                                <select class="form-control" id="intensity" style="width:inherit;" required>
+                                    <option selected disabled>-- Please Select --</option>
+                                    <option value = "0">Low</option>
+                                    <option value = "1">Normal</option>
+                                    <option value = "2">High</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="form-group" style="align-item:centre; margin-left:80px">
+                        <button class="cta-btn btn-block" onclick = "submitSymptoms(this)">Submit</button>
+                    </div>
+                </div>
+            </div>
             </pre>
             <div style="margin-top: 50px;">
                 <div class="panel-heading">
@@ -178,13 +213,21 @@
 <script src="js/bootstrap.min.js"></script>
 <script src="/js/web3.min.js"></script>
 <script src="js/app.js"></script>
+<script src="https://unpkg.com/ipfs-api/dist/index.min.js" crossorigin="anonymous"></script>
 
 <script>
+    var ipfs = window.IpfsApi('localhost', '5001')
+    const Buffer = window.IpfsApi().Buffer;
+
+    var intensityDict = {};
+    intensityDict[0] = "Low";
+    intensityDict[1] = "Normal";
+    intensityDict[2] = "High";
 
     var url_string = window.location.href;
     var url = new URL(url_string);
     var key ;
-
+    var pname="";
     toggleRecordsButton = 0;
     var recordHash = "";
 
@@ -221,6 +264,7 @@
                 $("#age").html(b.c[0]);
                 $("#email").html(c);
                 $("#recordsHash").html(recordHash);
+                pname=a;
 
                 if (insurerAddress != 0){
                     $("#buyInsurance").hide();
@@ -331,7 +375,9 @@
         if (toggleRecordsButton%2 == 0){
 
             $.get("http://localhost:8080/ipfs/"+recordHash, function(data){
-                $("#records").html(data);
+                // $("#records").html(data);
+                // $("#records").show();
+                $("#records").html(data + $("#records").html());
                 $("#records").show();
             })
 
@@ -407,7 +453,82 @@
         });
     }
 
-    
+    // New 
+    function submitSymptoms(element,index)
+    {
+        // var table = document.getElementById("viewPatient");
+        // var patientAddress = table.rows[index].cells[1].innerHTML;
+
+        // console.log(patientAddress);
+         var diagnosis = $("#intensity").val();
+         diagnosis = parseInt(diagnosis);
+         var diagnosed = intensityDict[diagnosis];
+         console.log("Diagnosis ",diagnosis);
+        var symp = document.getElementById("symptomes").value;
+        console.log('symp ', symp);
+        var oldRecords = $("#records").clone(); // Clone to avoid modifying original content
+    oldRecords.find("#notinclude").remove(); // Remove the #notinclude element and its children
+    var resultt = oldRecords.html(); // Get the remaining HTML content
+
+
+        console.log( "oldrecords ",resultt);
+        var newRecords = 
+`Symptoms updated By : ${pname}
+Symptomes updation Time : ${getDateTime()}
+Intensity: ${diagnosed}
+Symptomes : ${symp}
+`
+        console.log("newRecords", newRecords);
+        var updatedRecords = resultt+newRecords;
+        console.log("updatedRecords", updatedRecords);
+
+        if (!isNaN(diagnosis)){
+            console.log("Innn");
+            var buffer = Buffer(updatedRecords);
+
+            ipfs.files.add(buffer, (error, result) => {
+                if(error){
+                    console.log("Hereeee");
+                    console.log(error)
+                }else{
+                    console.log("goood");
+                    ipfshash = result[0].hash;
+                    contractInstance.set_hash_public(key, ipfshash, {gas: 1000000}, function(error, result){
+                        if(!error){
+                            alert("Your symptomes has been submitted.");
+                            // // delete content row
+                            // table.deleteRow(index+1);
+
+                            // // delete main row of corresponding content row
+                            // table.deleteRow(index); 
+                        }else{
+                            console.log("big error", error.message);
+                            $(".alert-danger").show();
+                            //console.log(error);
+                        }
+                    })
+                }
+            });
+
+            }
+            else{
+                alert("Select a diagnosis");
+            }
+            }
+
+        function getDateTime(){
+            function AddZero(num) {
+                return (num >= 0 && num < 10) ? "0" + num : num + "";
+            }
+            var now = new Date();
+            var strDateTime = [[AddZero(now.getDate()), 
+            AddZero(now.getMonth() + 1), 
+            now.getFullYear()].join("/"), 
+            [AddZero(now.getHours()), 
+            AddZero(now.getMinutes())].join(":"), 
+            now.getHours() >= 12 ? "PM" : "AM"].join(" ");
+            return strDateTime;
+        }
 
 </script>
 

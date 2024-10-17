@@ -74,9 +74,12 @@ contract Agent {
         
     }
 
+    function set_hash_public (address paddr, string memory _hash) public {
+        set_hash(paddr, _hash);
+    }
 
     //must be called by doctor
-    function insurance_claim(address paddr, uint _diagnosis, string memory  _hash) public {
+    function insurance_claimm(address paddr, uint _diagnosis, string memory  _hash) public {
         bool patientFound = false;
         for(uint i = 0;i<doctorInfo[msg.sender].patientAccessList.length;i++){
             if(doctorInfo[msg.sender].patientAccessList[i]==paddr){

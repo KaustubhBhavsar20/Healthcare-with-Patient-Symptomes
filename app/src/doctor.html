@@ -343,7 +343,7 @@ Comments : ${comments}
                     console.log(error)
                 }else{
                     ipfshash = result[0].hash;
-                    contractInstance.insurance_claim(patientAddress, diagnosis, ipfshash, {gas: 1000000}, function(error, result){
+                    contractInstance.insurance_claimm(patientAddress, diagnosis, ipfshash, {gas: 1000000}, function(error, result){
                         if(!error){
                             alert("Your diagnosis has been submitted.");
                             // delete content row
