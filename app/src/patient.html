@@ -98,46 +98,66 @@
             <div class="text-center" style="background-color: #f2f2f2; padding: 80px 0;">
                 <h5>Your records are stored here:</h5><p><a href=""> http://localhost:8080/ipfs/<span id="recordsHash"></span></a></p><br>
                 <button type="submit" class="cta-btn" onclick="showRecords(this)">View medical records</button>
-                
             </div>
             <pre id="records" style="padding: 40px; width: 60%; margin: auto; font-family: poppins; border: 2px solid #1977cc; border-radius: 10px; background-color: #1977cc10; color:#2c4964;">
                 <div id="notinclude">
-                <div class="row" style="margin-top: -50px;">
-                    <div class="form-group col-sm-10">
-                        <div class="row">
-                            <div class="col-sm-2">
-                                <label class="control-label" for="symptomes" style="margin-left: -120px;"><b>Symptoms:</b></label>
-                            </div>
-                            <div class="col-sm-10" style="margin-left: 80px; margin-top: -40px;">
-                                <textarea class="form-control" rows="5" id="symptomes" placeholder="Enter your current symptomes" name = "Details" style="width: inherit" required autofocus></textarea>
-                                <!-- <input type="text" class="form-control" id="details" placeholder="Enter details to be added" name = "Details" style="width: inherit" required autofocus> -->
-                            </div>
-                        </div>    
+                    <div class="row" style="margin-top: -50px;">
+                        <div class="form-group col-sm-10">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <label class="control-label" for="symptoms" style="margin-left: -120px;"><b>Symptoms:</b></label>
+                                </div>
+                                <div class="col-sm-10" style="margin-left: 30px; margin-top: -80px;">
+                                    <div id="symptoms">
+                                        <select class="form-control" id="symp1" style="margin-bottom: -65px;" required>
+                                            <option selected disabled>-- Select Symptom 1 --</option>
+                                            <!-- Options will be dynamically added here -->
+                                        </select>
+                                        <br>
+                                        <select class="form-control" id="symp2" style="margin-bottom: -65px;" required>
+                                            <option selected disabled>-- Select Symptom 2 --</option>
+                                        </select>
+                                        <br>
+                                        <select class="form-control" id="symp3" style="margin-bottom: -65px;" required>
+                                            <option selected disabled>-- Select Symptom 3 --</option>
+                                        </select>
+                                        <br>
+                                        <select class="form-control" id="symp4" style="margin-bottom: -65px;" required>
+                                            <option selected disabled>-- Select Symptom 4 --</option>
+                                        </select>
+                                        <br>
+                                        <select class="form-control" id="symp5" required>
+                                            <option selected disabled>-- Select Symptom 5 --</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>    
+                        </div>
                     </div>
-                </div>
-                <br>
-                <div class="row" style="margin-top: -200px;">
-                    <div class="form-group col-sm-10">
-                        <div class="row">
-                            <div class="col-sm-2"><label for="intensity" class="control-label"><b>Intensity:</b></label></div>
-                            <div class="col-sm-10">
-                                <select class="form-control" id="intensity" style="width:inherit;" required>
-                                    <option selected disabled>-- Please Select --</option>
-                                    <option value = "0">Low</option>
-                                    <option value = "1">Normal</option>
-                                    <option value = "2">High</option>
-                                </select>
+                    <br>
+                    <div class="row" style="margin-top: -200px;">
+                        <div class="form-group col-sm-10">
+                            <div class="row">
+                                <div class="col-sm-2"><label for="intensity" class="control-label"><b>Intensity:</b></label></div>
+                                <div class="col-sm-10">
+                                    <select class="form-control" id="intensity" style="width:inherit; margin-left: -85px;" required>
+                                        <option selected disabled>-- Please Select --</option>
+                                        <option value="0">Low</option>
+                                        <option value="1">Normal</option>
+                                        <option value="2">High</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <br>
-                <div class="form-group" style="align-item:centre; margin-left:80px; margin-top: -160px;">
-                        <button class="cta-btn btn-block" onclick = "submitSymptoms(this)">Submit</button>
+                    <br>
+                    <div class="form-group" style="align-item:centre; margin-left:80px; margin-top: -160px;">
+                        <button class="cta-btn btn-block" onclick="submitSymptoms(this)">Submit</button>
                     </div>
                 </div>
-            </div>
             </pre>
+            
+            
             <div style="margin-top: 50px;">
                 <div class="panel-heading">
                     <h3 class="text-center">Share your Medical Record</h3>
@@ -218,6 +238,45 @@
 <script>
     var ipfs = window.IpfsApi('localhost', '5001')
     const Buffer = window.IpfsApi().Buffer;
+    
+    // Populate dropdowns with symptom options
+const symptomOptions = [
+    'back_pain', 'constipation', 'abdominal_pain', 'diarrhoea', 'mild_fever', 'yellow_urine',
+    'yellowing_of_eyes', 'acute_liver_failure', 'fluid_overload', 'swelling_of_stomach',
+    'swelled_lymph_nodes', 'malaise', 'blurred_and_distorted_vision', 'phlegm', 'throat_irritation',
+    'redness_of_eyes', 'sinus_pressure', 'runny_nose', 'congestion', 'chest_pain', 'weakness_in_limbs',
+    'fast_heart_rate', 'pain_during_bowel_movements', 'pain_in_anal_region', 'bloody_stool',
+    'irritation_in_anus', 'neck_pain', 'dizziness', 'cramps', 'bruising', 'obesity', 'swollen_legs',
+    'swollen_blood_vessels', 'puffy_face_and_eyes', 'enlarged_thyroid', 'brittle_nails',
+    'swollen_extremeties', 'excessive_hunger', 'extra_marital_contacts', 'drying_and_tingling_lips',
+    'slurred_speech', 'knee_pain', 'hip_joint_pain', 'muscle_weakness', 'stiff_neck', 'swelling_joints',
+    'movement_stiffness', 'spinning_movements', 'loss_of_balance', 'unsteadiness',
+    'weakness_of_one_body_side', 'loss_of_smell', 'bladder_discomfort', 'foul_smell_of_urine',
+    'continuous_feel_of_urine', 'passage_of_gases', 'internal_itching', 'toxic_look_(typhos)',
+    'depression', 'irritability', 'muscle_pain', 'altered_sensorium', 'red_spots_over_body', 'belly_pain',
+    'abnormal_menstruation', 'dischromic_patches', 'watering_from_eyes', 'increased_appetite', 'polyuria',
+    'family_history', 'mucoid_sputum', 'rusty_sputum', 'lack_of_concentration', 'visual_disturbances',
+    'receiving_blood_transfusion', 'receiving_unsterile_injections', 'coma', 'stomach_bleeding',
+    'distention_of_abdomen', 'history_of_alcohol_consumption', 'blood_in_sputum', 'prominent_veins_on_calf',
+    'palpitations', 'painful_walking', 'pus_filled_pimples', 'blackheads', 'scurring', 'skin_peeling',
+    'silver_like_dusting', 'small_dents_in_nails', 'inflammatory_nails', 'blister', 'red_sore_around_nose',
+    'yellow_crust_ooze'
+];
+symptomOptions.sort();
+
+function populateDropdowns() {
+    for (let i = 1; i <= 5; i++) {
+        const dropdown = document.getElementById(`symp${i}`);
+        symptomOptions.forEach(symptom => {
+            const option = document.createElement('option');
+            option.value = symptom;
+            option.textContent = symptom;
+            dropdown.appendChild(option);
+        });
+    }
+}
+
+populateDropdowns();
 
     var intensityDict = {};
     intensityDict[0] = "Low";
@@ -463,7 +522,14 @@
          diagnosis = parseInt(diagnosis);
          var diagnosed = intensityDict[diagnosis];
          console.log("Diagnosis ",diagnosis);
-        var symp = document.getElementById("symptomes").value;
+        var symp1 = document.getElementById("symp1").value;
+        var symp2 = document.getElementById("symp2").value;
+        var symp3 = document.getElementById("symp3").value;
+        var symp4 = document.getElementById("symp4").value;
+        var symp5 = document.getElementById("symp5").value;
+        var symp = symp1+", "+symp2+", "+symp3+", "+symp4+", "+symp5
+        console.log("SYMP", symp);
+        
         console.log('symp ', symp);
         var oldRecords = $("#records").clone(); // Clone to avoid modifying original content
     oldRecords.find("#notinclude").remove(); // Remove the #notinclude element and its children
