@@ -213,7 +213,13 @@
 
                     $.get("http://localhost:8080/ipfs/"+result, function(data){
                         patientRecord = data;
-
+                        const match = data.match(/Symptomes\s*:\s*(.+?)\s*[-]/g);
+                        if (match) {
+                            // Extract the last match and remove "Symptomes :" from it
+                            const lastSymptoms = match[match.length - 1].replace(/Symptomes\s*:\s*/, '').replace(/[-]/g, '').trim();
+                            const sym = lastSymptoms.split(',').map(item => item.trim());
+                            console.log("Symptomes Array", sym);
+                        }
                         content = `<div style="padding: 40px; width: 100%; margin: auto; font-family: poppins; border: 2px solid #1977cc; border-radius: 10px; background-color: #1977cc10; color:#2c4964;">
                         <div id="view${patientAddress}">
                                 <div class="row">
